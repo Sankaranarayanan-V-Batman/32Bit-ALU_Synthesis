@@ -17,7 +17,48 @@ Synthesis requires three files as follows,
 ◦ Liberty Files (.lib)
 
 ◦ Verilog/VHDL Files (.v or .vhdl or .vhd)
+Design Code:
+module ALU ( input [3:0] A, B, input [2:0] ALU_Sel, output reg [3:0] ALU_Out, output regCarryOut );
+```
+always @(*) begin
+  case (ALU_Sel)
+    3'b000: {CarryOut, ALU_Out} = A + B;
+    3'b001: {CarryOut, ALU_Out} = A - B;
+    3'b010: ALU_Out = A & B;
+    3'b011: ALU_Out = A | B;
+    3'b100: ALU_Out = A ^ B;
+    3'b101: ALU_Out = ~A;
+    3'b110: ALU_Out = A << 1;
+    3'b111: ALU_Out = A >> 1;
+    default: ALU_Out =4'b0000;
+  endcase
+end
+endmodule
+```
+TestBench:
+module ALU_tb; reg [3:0] A, B; reg [2:0] ALU_Sel; wire [3:0] ALU_Out; wire CarryOut;
+```
+ALU uut (
+     .A(A),
+     .B(B),
+     .ALU_Sel(ALU_Sel),
+     .ALU_Out(ALU_Out),
+     .CarryOut(CarryOut)
+);
+initial begin
+    A = 4'b0101; B = 4'b0011; ALU_Sel = 3'b000; #10;
+    A = 4'b0101; B = 4'b0011; ALU_Sel = 3'b001; #10;
+    A = 4'b1100; B = 4'b1010; ALU_Sel = 3'b010; #10;
+    A = 4'b1100; B = 4'b1010; ALU_Sel = 3'b011; #10;
+    A = 4'b1100; B = 4'b1010; ALU_Sel = 3'b100; #10;
+    A = 4'b1100; B = 4'b1010; ALU_Sel = 3'b101; #10;
+    A = 4'b0011; B = 4'b0000; ALU_Sel = 3'b110; #10;
+    A = 4'b0011; B = 4'b0000; ALU_Sel = 3'b111; #10;
+    $finish;
+end
 
+endmodule
+```
 ### Step 2 : Performing Synthesis
 
 The Liberty files are present in the library path,
